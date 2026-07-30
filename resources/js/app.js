@@ -1,1 +1,2 @@
 //
+import './restaurant/editor';
