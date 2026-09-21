@@ -8,9 +8,11 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+    use HasApiTokens;
     use HasFactory;
     use Notifiable;
     use HasRoles;
@@ -23,6 +25,7 @@ class User extends Authenticatable
         'phone',
         'photo',
         'password',
+        'pin',
         'active',
         'locale',
         'theme',
@@ -31,6 +34,7 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password',
+        'pin',
         'remember_token',
     ];
 
@@ -41,6 +45,7 @@ class User extends Authenticatable
             'last_login' => 'datetime',
             'active' => 'boolean',
             'password' => 'hashed',
+            'pin' => 'hashed',
         ];
     }
 

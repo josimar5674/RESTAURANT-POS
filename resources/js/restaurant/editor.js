@@ -13,7 +13,7 @@ import {
 
 const container = document.getElementById('konva-container');
 
-let selectedTable = null;
+let selectedObject = null;
 
 let editorMode = 'select';
 
@@ -59,19 +59,22 @@ if (container) {
 
             e.cancelBubble = true;
 
-            if (selectedTable) {
-                selectedTable.unselect();
+            if (selectedObject) {
+                selectedObject.unselect();
             }
 
-            selectedTable = table;
+            selectedObject = table;
             const input = document.getElementById('table-name');
 
             input.disabled = false;
             deleteButton.disabled = false;
+            rotateLeft.disabled = false;
+
+            rotateRight.disabled = false;
 
             input.value = table.options.name;
 
-            selectedTable.select();
+            selectedObject.select();
 
         });
 
@@ -82,11 +85,15 @@ if (container) {
 
             table.savePosition();
 
+            
+
         });
 
 
 
     }
+
+
 function registerWall(wall) {
 
     tables.push(wall);
@@ -95,14 +102,18 @@ function registerWall(wall) {
 
         e.cancelBubble = true;
 
-        if (selectedTable) {
-            selectedTable.unselect();
+        if (selectedObject) {
+            selectedObject.unselect();
         }
 
-        selectedTable = wall;
+        selectedObject = wall;
 
         tableName.disabled = true;
         tableName.value = '';
+
+        rotateLeft.disabled = false;
+
+        rotateRight.disabled = false;
 
         deleteButton.disabled = false;
 
@@ -190,38 +201,47 @@ function registerWall(wall) {
                 properties: {}
 
             };
+try {
 
-            try {
+    const response = await saveObject(objectData);
 
-                const response = await saveObject(objectData);
+    console.log('RESPUESTA:', response);
 
-                const table = new Table(layer, {
+    const table = new Table(layer, {
 
-                    id: response.data.id,
+        id: response.data.id,
 
-                    name: response.data.name,
+        name: response.data.name,
 
-                    x: response.data.x,
+        x: response.data.x,
 
-                    y: response.data.y,
+        y: response.data.y,
 
-                    shape: response.data.shape
+        rotation: Number(response.data.rotation),
 
-                });
+        shape: response.data.shape
 
-                registerTable(table);
+    });
 
-                layer.draw();
+    console.log('MESA CREADA');
 
-                activateTool('select');
+    registerTable(table);
 
-            } catch (error) {
+    console.log('MESA REGISTRADA');
 
-                console.error(error);
+    layer.draw();
 
-                alert('No fue posible guardar la mesa.');
+    activateTool('select');
 
-            }
+} catch (error) {
+
+    console.error(error);
+
+    console.error(error.stack);
+
+    alert(error.message);
+
+}
 
             return;
         }
@@ -298,15 +318,18 @@ function registerWall(wall) {
 }
 
         // Deseleccionar
-        if (selectedTable) {
+        if (selectedObject) {
 
-            selectedTable.unselect();
+            selectedObject.unselect();
 
-            selectedTable = null;
+            selectedObject = null;
             tableName.value = '';
             tableName.disabled = true;
 
             deleteButton.disabled = true;
+            rotateLeft.disabled = true; 
+            rotateRight.disabled = true;
+            
 
         }
 
@@ -331,7 +354,7 @@ function registerWall(wall) {
                                 id: object.id,
 
                                 name: object.name,
-
+                                    rotation: Number(object.rotation),
                                 x: Number(object.x),
                                 y: Number(object.y),
                                 shape: object.shape
@@ -384,16 +407,17 @@ function registerWall(wall) {
     const deleteButton = document.getElementById('btn-delete-object');
     const areaSelector = document.getElementById('area-selector');
     const newAreaButton = document.getElementById('btn-new-area');
-
+const rotateLeft = document.getElementById('btn-rotate-left');
+const rotateRight = document.getElementById('btn-rotate-right');
     let currentArea = null;
 
     if (tableName) {
 
         tableName.addEventListener('change', () => {
 
-            if (!selectedTable) return;
+            if (!selectedObject) return;
 
-            selectedTable.setName(tableName.value);
+            selectedObject.setName(tableName.value);
 
         });
 
@@ -404,30 +428,32 @@ function registerWall(wall) {
 
         console.log('CLICK EN EL BOTÓN');
 
-        if (!selectedTable) return;
+        if (!selectedObject) return;
 
-        if (!confirm(`¿Desea eliminar "${selectedTable.options.name}"?`)) {
+        if (!confirm(`¿Desea eliminar "${selectedObject.options.name}"?`)) {
             return;
         }
 
         try {
 
-            await deleteObject(selectedTable.options.id);
+            await deleteObject(selectedObject.options.id);
 
-            selectedTable.group.destroy();
+            selectedObject.group.destroy();
 
-            const index = tables.indexOf(selectedTable);
+            const index = tables.indexOf(selectedObject);
 
             if (index > -1) {
                 tables.splice(index, 1);
             }
 
-            selectedTable = null;
+            selectedObject = null;
 
             tableName.value = '';
             tableName.disabled = true;
 
             deleteButton.disabled = true;
+            rotateLeft.disabled = true;
+            rotateRight.disabled = true;
 
             layer.draw();
 
@@ -441,9 +467,9 @@ function registerWall(wall) {
 
     });
 
-    await loadAreaSelector();
+await loadAreaSelector();
 
-    loadFloor();
+await loadFloor(currentArea);
 
     areaSelector.addEventListener('change', async () => {
 
@@ -454,7 +480,7 @@ function registerWall(wall) {
 
         tables.length = 0;
 
-        selectedTable = null;
+        selectedObject = null;
 
         layer.draw();
 
@@ -530,5 +556,23 @@ await loadFloor(currentArea);
 });
     
 
+
+rotateLeft.addEventListener('click', () => {
+
+    if (!selectedObject) return;
+
+    selectedObject.rotate(-15);
+
+});
+
+rotateRight.addEventListener('click', () => {
+
+        console.log('ROTAR +');
+
+    if (!selectedObject) return;
+
+    selectedObject.rotate(15);
+
+});
 }
 

@@ -79,20 +79,31 @@
     </nav>
 
     <!-- Usuario -->
-    <div class="border-t border-slate-800 p-6">
+ <!-- Usuario -->
+<div class="border-t border-slate-800 p-6">
 
-        <div class="font-semibold">
-
-            {{ auth()->user()->first_name }}
-
-        </div>
-
-        <div class="text-sm text-slate-400">
-
-            {{ auth()->user()->email }}
-
-        </div>
-
+    <div class="font-semibold">
+        {{ auth()->user()?->first_name }}
     </div>
+
+    <div class="text-sm text-slate-400 mb-4">
+        {{ auth()->user()?->email }}
+    </div>
+
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+
+        <button
+            type="submit"
+            class="w-full text-left px-4 py-2 rounded-lg
+                   text-slate-300 hover:bg-slate-800
+                   hover:text-white transition"
+        >
+            Cerrar sesión
+        </button>
+
+    </form>
+
+</div>
 
 </aside>

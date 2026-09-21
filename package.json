@@ -14,6 +14,7 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
+        "alpinejs": "^3.16.1",
         "konva": "^10.3.0"
     }
 }

@@ -169,4 +169,28 @@ for (let i = 0; i < 35; i++) {
 
     }
 
+    async rotate(angle) {
+
+    this.group.rotate(angle);
+
+    this.options.rotation = this.group.rotation();
+
+    this.layer.draw();
+
+    try {
+
+        await updateObject(this.options.id, {
+
+            rotation: this.options.rotation
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
 }

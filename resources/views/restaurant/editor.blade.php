@@ -110,6 +110,8 @@
                         Nombre
                     </label>
 
+
+
                     <input
                         id="table-name"
                         type="text"
@@ -118,6 +120,36 @@
                         disabled>
 
                 </div>
+
+                <div class="mt-5">
+
+    <label class="block text-sm font-medium mb-2">
+        Rotación
+    </label>
+
+    <div class="flex gap-2">
+
+        <button
+            id="btn-rotate-left"
+            class="flex-1 rounded-lg border border-slate-300 py-2 hover:bg-slate-100"
+            disabled>
+
+            ↺ -15°
+
+        </button>
+
+        <button
+            id="btn-rotate-right"
+            class="flex-1 rounded-lg border border-slate-300 py-2 hover:bg-slate-100"
+            disabled>
+
+            +15° ↻
+
+        </button>
+
+    </div>
+
+</div>
 
                 <hr>
 

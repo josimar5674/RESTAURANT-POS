@@ -14,19 +14,26 @@ export default class Table {
             x: options.x ?? 150,
             y: options.y ?? 150,
             shape: options.shape ?? 'square',
+            rotation: options.rotation ?? 0,
             status: options.status ?? 'available'
+
         };
 
         this.draw();
     }
 
     draw() {
+this.group = new Konva.Group({
 
-        this.group = new Konva.Group({
-            x: this.options.x,
-            y: this.options.y,
-            draggable: true
-        });
+    x: this.options.x,
+
+    y: this.options.y,
+
+    rotation: this.options.rotation ?? 0,
+
+    draggable: true
+
+});
 
         if (this.options.shape === 'round') {
             this.drawRoundTable();
@@ -225,5 +232,27 @@ async savePosition() {
     }
 
 }
+async rotate(angle) {
 
+    this.group.rotate(angle);
+
+    this.options.rotation = this.group.rotation();
+
+    this.layer.draw();
+
+    try {
+
+        await updateObject(this.options.id, {
+
+            rotation: this.options.rotation
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
 }
