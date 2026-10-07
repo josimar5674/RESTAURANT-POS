@@ -22,7 +22,7 @@
 <div class="space-y-5">
 
     {{-- Información principal --}}
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-[0.85fr_1.15fr]">
 
         {{-- Columna izquierda --}}
         <div class="space-y-4">
@@ -98,6 +98,43 @@
 
             </div>
 
+            {{-- Impuesto --}}
+<div>
+    <label
+        for="tax_id_{{ $formKey }}"
+        class="mb-1.5 block text-sm font-semibold text-slate-700"
+    >
+        Impuesto aplicable
+    </label>
+
+<select
+    name="tax_id"
+    class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+>
+    <option
+        value=""
+        data-tax-rate="0"
+        @selected(!$product?->tax_id)
+    >
+        Sin impuesto
+    </option>
+
+    @foreach($taxes as $tax)
+        <option
+            value="{{ $tax->id }}"
+            data-tax-rate="{{ $tax->rate }}"
+            @selected($product?->tax_id == $tax->id)
+        >
+            {{ $tax->name }} ({{ $tax->rate }}%)
+        </option>
+    @endforeach
+</select>
+
+    <p class="mt-1.5 text-xs text-slate-500">
+        Selecciona el impuesto que se aplicará al precio del producto.
+    </p>
+</div>
+
 
             <div>
 
@@ -144,52 +181,63 @@
 
 
             {{-- Precio único --}}
-          <div
-                id="{{ $formKey }}-single-price"
-                data-single-price
-                class="space-y-2"
-            >
+         {{-- Precio único --}}
+<div id="{{ $formKey }}-single-price" data-single-price class="space-y-3">
 
-                <label
-                    for="{{ $formKey }}-price"
-                    class="block text-sm font-medium text-slate-700"
+    <div class="grid grid-cols-2 gap-3">
+
+        {{-- Precio base --}}
+        <div>
+            <label class="mb-1 block text-xs font-medium text-slate-600">
+                Precio base
+            </label>
+
+            <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-slate-400">
+                    L
+                </span>
+
+                <input
+                    type="number"
+                    id="{{ $formKey }}-price"
+                    data-price
+                    name="price"
+                    value="{{ old('price', isset($product) ? optional($product->variants->first())->price : '') }}"
+                    step="0.01"
+                    min="0"
+                    class="w-full rounded-lg border border-slate-200 bg-white py-2 pl-8 pr-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
-                    Precio
-                </label>
-
-                <div class="relative">
-
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                        L
-                    </span>
-
-                   <input
-
-                        type="number"
-                        id="{{ $formKey }}-price"
-                        data-price
-                        name="price"
-                        value="{{ old(
-                                'price',
-                                isset($product)
-                                    ? optional($product->variants->first())->price
-                                    : ''
-                            ) }}"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        class="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-8 pr-4 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                    >
-
-                </div>
-
-                @error('price')
-                    <p class="text-sm text-red-600">
-                        {{ $message }}
-                    </p>
-                @enderror
-
             </div>
+        </div>
+
+        {{-- Precio final --}}
+        <div>
+            <label class="mb-1 block text-xs font-medium text-slate-600">
+                Precio final
+            </label>
+
+            <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-slate-400">
+                    L
+                </span>
+
+                <input
+                    type="text"
+                    data-final-price
+                    readonly
+                    class="w-full rounded-lg border border-slate-200 bg-slate-100 py-2 pl-8 pr-3 text-sm text-slate-700"
+                    value="0.00"
+                >
+            </div>
+        </div>
+
+    </div>
+
+    @error('price')
+        <p class="text-xs text-red-500">{{ $message }}</p>
+    @enderror
+
+</div>
 
 
             {{-- Tiene variantes --}}
@@ -233,114 +281,148 @@
 
 
             {{-- Variantes --}}
-           <div
+   {{-- Variantes --}}
+<div
     id="{{ $formKey }}-variants-section"
     data-variants-section
-                class="mt-4 hidden"
-            >
-
-                <div class="mb-3 flex items-center justify-between">
-
-                    <h4 class="text-sm font-semibold text-slate-700">
-                        Variantes
-                    </h4>
-
-                            <button
-                type="button"
-                onclick="addProductVariant(
-                    this.closest('form').querySelector('[data-variants-container]')
-                )"
-                  class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
-                    >
-                        + Agregar
-                    </button>
-
-                </div>
-<div
-    id="{{ $formKey }}-variants-container"
-    data-variants-container
-    class="max-h-48 space-y-2 overflow-y-auto pr-1"
+    class="mt-4 hidden"
 >
 
-    @if(isset($product))
+    <div class="mb-3 flex items-center justify-between">
 
-        @foreach($product->variants as $index => $variant)
+        <h4 class="text-sm font-semibold text-slate-700">
+            Variantes
+        </h4>
 
-            @if($variant->name !== 'Único' || $product->variants->count() > 1)
+        <button
+            type="button"
+            onclick="addProductVariant(
+                this.closest('form').querySelector('[data-variants-container]')
+            )"
+            class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
+        >
+            + Agregar
+        </button>
 
-                <div class="variant-row flex items-end gap-3 rounded-lg border border-slate-200 bg-white p-3">
+    </div>
 
-                    <input
-                        type="hidden"
-                        name="variants[{{ $index }}][id]"
-                        value="{{ $variant->id }}"
-                    >
+    <div
+        id="{{ $formKey }}-variants-container"
+        data-variants-container
+        class="max-h-48 space-y-2 overflow-y-auto pr-1"
+    >
 
-                    <div class="flex-1">
+        @if(isset($product))
 
-                        <label class="mb-1 block text-xs font-medium text-slate-500">
-                            Nombre
-                        </label>
+            @foreach($product->variants as $index => $variant)
+
+                @if($variant->name !== 'Único' || $product->variants->count() > 1)
+
+                    <div class="variant-row flex items-end gap-3 rounded-lg border border-slate-200 bg-white p-3">
 
                         <input
-                            type="text"
-                            name="variants[{{ $index }}][name]"
-                            value="{{ $variant->name }}"
-                            required
-                            class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                            type="hidden"
+                            name="variants[{{ $index }}][id]"
+                            value="{{ $variant->id }}"
                         >
 
-                    </div>
+                        {{-- Nombre --}}
+                        <div class="w-32 shrink-0">
 
-                    <div class="w-32">
-
-                        <label class="mb-1 block text-xs font-medium text-slate-500">
-                            Precio
-                        </label>
-
-                        <div class="relative">
-
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
-                                L
-                            </span>
+                            <label class="mb-1 block text-xs font-medium text-slate-600">
+                                Nombre
+                            </label>
 
                             <input
-                                type="number"
-                                name="variants[{{ $index }}][price]"
-                                value="{{ $variant->price }}"
-                                min="0"
-                                step="0.01"
-                                required
-                                class="w-full rounded-lg border border-slate-300 py-2 pl-7 pr-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                type="text"
+                                name="variants[{{ $index }}][name]"
+                                value="{{ old("variants.$index.name", $variant->name) }}"
+                                class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                placeholder="Ej. 12 unidades"
                             >
 
                         </div>
 
+                        {{-- Precio base --}}
+                        <div class="w-32 shrink-0">
+
+                            <label class="mb-1 block text-xs font-medium text-slate-600">
+                                Precio base
+                            </label>
+
+                            <div class="relative">
+
+                                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-slate-400">
+                                    L
+                                </span>
+
+                                <input
+                                    type="number"
+                                    name="variants[{{ $index }}][price]"
+                                    value="{{ old("variants.$index.price", $variant->price) }}"
+                                    step="0.01"
+                                    min="0"
+                                    data-variant-base-price
+                                    class="w-full rounded-lg border border-slate-200 bg-white py-2 pl-8 pr-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                >
+
+                            </div>
+
+                        </div>
+
+                        {{-- Precio final --}}
+                        <div class="w-32 shrink-0">
+
+                            <label class="mb-1 block text-xs font-medium text-slate-600">
+                                Precio final
+                            </label>
+
+                            <div class="relative">
+
+                                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-slate-400">
+                                    L
+                                </span>
+
+                                <input
+                                    type="text"
+                                    data-variant-final-price
+                                    readonly
+                                    value="0.00"
+                                    class="w-full rounded-lg border border-slate-200 bg-slate-100 py-2 pl-8 pr-2 text-sm text-slate-700"
+                                >
+
+                            </div>
+
+                        </div>
+
+                        {{-- Eliminar --}}
+                        <button
+                            type="button"
+                            onclick="this.closest('.variant-row').remove()"
+                            class="h-9 w-9 shrink-0 rounded-lg border border-red-200 text-red-500 hover:bg-red-50"
+                            title="Eliminar variante"
+                        >
+                            ✕
+                        </button>
+
                     </div>
 
-                    <button
-                        type="button"
-                        onclick="this.closest('.variant-row').remove()"
-                        class="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-500 transition hover:bg-red-50"
-                    >
-                        ✕
-                    </button>
+                @endif
 
-                </div>
+            @endforeach
 
-            @endif
+        @endif
 
-        @endforeach
-
-    @endif
+    </div>
 
 </div>
 
-            </div>
+</div> {{-- Cierra columna derecha --}}
 
-        </div>
+</div> {{-- Cierra grid principal --}}
 
-    </div>
+{{-- Modificadores --}}
+<div class="border-t border-slate-200 pt-6">
 
     {{-- Modificadores --}}
 <div class="border-t border-slate-200 pt-6">

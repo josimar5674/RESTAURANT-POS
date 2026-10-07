@@ -165,6 +165,10 @@
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                            Precio al cliente
+                        </th>
+
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Orden
                         </th>
 
@@ -219,6 +223,39 @@
                                 @endif
 
                             </td>
+
+                            <td class="px-6 py-4">
+
+                                    @php
+                                        $taxRate = (float) ($modifierGroup->tax?->rate ?? 0);
+                                        $priceAdjustment = (float) $option->price_adjustment;
+                                        $customerPrice = $priceAdjustment * (1 + $taxRate / 100);
+                                    @endphp
+
+                                    @if($priceAdjustment > 0)
+
+                                        <div>
+                                            <span class="font-semibold text-slate-800">
+                                                L {{ number_format($customerPrice, 2) }}
+                                            </span>
+
+                                            @if($taxRate > 0)
+                                                <p class="mt-0.5 text-xs text-slate-400">
+                                                    Incluye {{ number_format($taxRate, 2) }}% impuesto
+                                                </p>
+                                            @endif
+                                        </div>
+
+                                    @else
+
+                                        <span class="text-slate-500">
+                                            L 0.00
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
 
 
                             <td class="px-6 py-4 text-sm text-slate-600">
@@ -287,7 +324,7 @@
 
                         <tr>
 
-                            <td colspan="5" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
 
                                 <p class="font-medium text-slate-700">
                                     No hay opciones registradas

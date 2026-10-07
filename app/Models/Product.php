@@ -10,6 +10,7 @@ class Product extends Model
     protected $fillable = [
         'uuid',
         'category_id',
+        'tax_id',
         'name',
         'description',
         'image',
@@ -46,15 +47,19 @@ class Product extends Model
         );
     }
 
-public function modifierGroups()
-{
-    return $this->belongsToMany(
-        ModifierGroup::class,
-        'product_modifier_groups'
-    )
-    ->using(ProductModifierGroup::class)
-    ->withPivot('uuid', 'sort_order')
-    ->orderByPivot('sort_order');
-}
+    public function modifierGroups()
+    {
+        return $this->belongsToMany(
+            ModifierGroup::class,
+            'product_modifier_groups'
+        )
+        ->using(ProductModifierGroup::class)
+        ->withPivot('uuid', 'sort_order')
+        ->orderByPivot('sort_order');
+    }
 
+    public function tax()
+    {
+        return $this->belongsTo(Tax::class);
+    }
 }

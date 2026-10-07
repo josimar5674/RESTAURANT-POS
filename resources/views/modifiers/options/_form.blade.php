@@ -45,39 +45,73 @@
     </div>
 
 
-    {{-- Precio --}}
-    <div>
 
-        <label
-            for="{{ $isEdit ? 'edit-option-price-'.$option->id : 'new-option-price' }}"
-            class="mb-2 block text-sm font-medium text-slate-700"
+{{-- Precio --}}
+<div>
+
+    <label
+        for="{{ $isEdit ? 'edit-option-price-'.$option->id : 'new-option-price' }}"
+        class="mb-2 block text-sm font-medium text-slate-700"
+    >
+        Ajuste de precio
+    </label>
+
+    <div class="relative">
+
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+            L
+        </span>
+
+        <input
+            type="number"
+            id="{{ $isEdit ? 'edit-option-price-'.$option->id : 'new-option-price' }}"
+            name="price_adjustment"
+            value="{{ old('price_adjustment', $option->price_adjustment ?? 0) }}"
+            step="0.01"
+            min="0"
+            placeholder="0.00"
+            data-tax-rate="{{ $modifierGroup->tax?->rate ?? 0 }}"
+            oninput="updateModifierOptionPrice(this)"
+            class="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-8 pr-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
         >
-            Ajuste de precio
-        </label>
 
-        <div class="relative">
+    </div>
 
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
-                L
-            </span>
+    <p class="mt-1 text-xs text-slate-500">
+        Usa 0.00 si la opción no tiene costo adicional.
+    </p>
 
-            <input
-                type="number"
-                id="{{ $isEdit ? 'edit-option-price-'.$option->id : 'new-option-price' }}"
-                name="price_adjustment"
-                value="{{ old('price_adjustment', $option->price_adjustment ?? 0) }}"
-                step="0.01"
-                placeholder="0.00"
-                class="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-8 pr-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+
+    {{-- Precio final con impuesto --}}
+    <div class="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+
+        <div class="flex items-center justify-between">
+
+            <div>
+
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    Precio al cliente
+                </p>
+
+                <p class="mt-0.5 text-xs text-slate-400">
+                    Incluye impuesto
+                    ({{ number_format($modifierGroup->tax?->rate ?? 0, 2) }}%)
+                </p>
+
+            </div>
+
+            <p
+                id="{{ $isEdit ? 'edit-option-final-price-'.$option->id : 'new-option-final-price' }}"
+                class="text-lg font-bold text-slate-800"
             >
+                L 0.00
+            </p>
 
         </div>
 
-        <p class="mt-1 text-xs text-slate-500">
-            Usa 0.00 si la opción no tiene costo adicional.
-        </p>
-
     </div>
+
+</div>
 
 
     {{-- Orden --}}

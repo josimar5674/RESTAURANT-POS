@@ -95,6 +95,10 @@ function toggleProductVariants(checkbox) {
 
         }
 
+        variantsContainer
+    .querySelectorAll('input[name^="variants"]')
+    .forEach(input => input.required = true);
+
     } else {
 
         // Mostrar precio único
@@ -103,13 +107,16 @@ function toggleProductVariants(checkbox) {
         // Ocultar variantes
         variantsSection.classList.add('hidden');
 
+        variantsContainer
+    .querySelectorAll('input[name^="variants"]')
+    .forEach(input => input.required = false);
+
     }
 }
 
 function addProductVariant(container) {
 
     const index = productVariantIndex++;
-   
 
     const row = document.createElement('div');
 
@@ -117,7 +124,7 @@ function addProductVariant(container) {
         'variant-row flex items-end gap-3 rounded-lg border border-slate-200 bg-white p-3';
 
     row.innerHTML = `
-        <div class="flex-1">
+        <div class="min-w-0 flex-1">
 
             <label class="mb-1 block text-xs font-medium text-slate-500">
                 Nombre
@@ -127,21 +134,21 @@ function addProductVariant(container) {
                 type="text"
                 name="variants[${index}][name]"
                 placeholder="Ej. Sencilla"
-                required
+        
                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
             >
 
         </div>
 
-        <div class="w-32">
+        <div class="w-32 shrink-0">
 
             <label class="mb-1 block text-xs font-medium text-slate-500">
-                Precio
+                Precio base
             </label>
 
             <div class="relative">
 
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
                     L
                 </span>
 
@@ -151,8 +158,33 @@ function addProductVariant(container) {
                     placeholder="0.00"
                     min="0"
                     step="0.01"
-                    required
+                
+                    data-variant-base-price
                     class="w-full rounded-lg border border-slate-300 bg-white py-2 pl-7 pr-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                >
+
+            </div>
+
+        </div>
+
+        <div class="w-32 shrink-0">
+
+            <label class="mb-1 block text-xs font-medium text-slate-500">
+                Precio final
+            </label>
+
+            <div class="relative">
+
+                <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                    L
+                </span>
+
+                <input
+                    type="text"
+                    data-variant-final-price
+                    value="0.00"
+                    readonly
+                    class="w-full rounded-lg border border-slate-200 bg-slate-100 py-2 pl-7 pr-2 text-sm text-slate-700"
                 >
 
             </div>
@@ -162,23 +194,38 @@ function addProductVariant(container) {
         <button
             type="button"
             onclick="this.closest('.variant-row').remove()"
-            class="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-500 transition hover:bg-red-50"
+            class="h-9 w-9 shrink-0 rounded-lg border border-red-200 text-red-500 transition hover:bg-red-50"
+            title="Eliminar variante"
         >
             ✕
         </button>
     `;
 
     container.appendChild(row);
+
+    // Actualizar precio final inmediatamente
+    const form = container.closest('form');
+
+    if (form && typeof updateProductFinalPrices === 'function') {
+        updateProductFinalPrices(form);
+    }
 }
 
 function openEditProductModal(id) {
+    const modal = document.getElementById('editProductModal' + id);
 
-    const modal = document.getElementById(
-        'editProductModal' + id
-    );
+    if (!modal) {
+        return;
+    }
+
+    const form = modal.querySelector('form');
+
+    if (form) {
+        // Guardamos el estado original completo del formulario
+        form.dataset.originalHtml = form.innerHTML;
+    }
 
     modal.classList.remove('hidden');
-
     modal.setAttribute('aria-hidden', 'false');
 
     document.body.classList.add('overflow-hidden');
@@ -186,13 +233,23 @@ function openEditProductModal(id) {
 
 
 function closeEditProductModal(id) {
+    const modal = document.getElementById('editProductModal' + id);
 
-    const modal = document.getElementById(
-        'editProductModal' + id
-    );
+    if (!modal) {
+        return;
+    }
+
+    const form = modal.querySelector('form');
+
+    if (form && form.dataset.originalHtml) {
+        // Restauramos exactamente como estaba al abrir
+        form.innerHTML = form.dataset.originalHtml;
+
+        // Volvemos a inicializar el cálculo de precios
+        initializeProductPriceCalculation(form);
+    }
 
     modal.classList.add('hidden');
-
     modal.setAttribute('aria-hidden', 'true');
 
     document.body.classList.remove('overflow-hidden');
@@ -223,7 +280,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 variantsSection.classList.remove('hidden');
 
+
             }
+            initializeProductPriceCalculation(form);
 
         });
 
@@ -302,6 +361,118 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+
+function updateProductFinalPrices(form) {
+
+    const taxSelect = form.querySelector('select[name="tax_id"]');
+
+    if (!taxSelect) {
+        return;
+    }
+
+    const selectedOption =
+        taxSelect.options[taxSelect.selectedIndex];
+
+    const taxRate =
+        parseFloat(selectedOption?.dataset.taxRate || 0);
+
+
+    // =========================
+    // Precio único
+    // =========================
+
+    const basePriceInput =
+        form.querySelector('[data-price]');
+
+    const finalPriceInput =
+        form.querySelector('[data-final-price]');
+
+    if (basePriceInput && finalPriceInput) {
+
+        const basePrice =
+            parseFloat(basePriceInput.value) || 0;
+
+        const finalPrice =
+            basePrice * (1 + taxRate / 100);
+
+        finalPriceInput.value =
+            finalPrice.toFixed(2);
+    }
+
+
+    // =========================
+    // Variantes
+    // =========================
+
+    form.querySelectorAll('.variant-row').forEach(function (row) {
+
+        const baseInput =
+            row.querySelector('[data-variant-base-price]');
+
+        const finalInput =
+            row.querySelector('[data-variant-final-price]');
+
+        if (!baseInput || !finalInput) {
+            return;
+        }
+
+        const basePrice =
+            parseFloat(baseInput.value) || 0;
+
+        const finalPrice =
+            basePrice * (1 + taxRate / 100);
+
+        finalInput.value =
+            finalPrice.toFixed(2);
+    });
+}
+
+function initializeProductPriceCalculation(form) {
+
+    const taxSelect =
+        form.querySelector('select[name="tax_id"]');
+
+    if (!taxSelect) {
+        return;
+    }
+
+    taxSelect.addEventListener('change', function () {
+
+        updateProductFinalPrices(form);
+
+    });
+
+
+    const basePriceInput =
+        form.querySelector('[data-price]');
+
+    if (basePriceInput) {
+
+        basePriceInput.addEventListener('input', function () {
+
+            updateProductFinalPrices(form);
+
+        });
+
+    }
+
+
+    form.addEventListener('input', function (event) {
+
+        if (
+            event.target.matches('[data-variant-base-price]')
+        ) {
+
+            updateProductFinalPrices(form);
+
+        }
+
+    });
+
+
+    // Calcular al cargar
+    updateProductFinalPrices(form);
+}
 window.openProductModal = openProductModal;
 window.closeProductModal = closeProductModal;
 window.toggleProductVariants = toggleProductVariants;

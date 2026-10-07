@@ -137,6 +137,49 @@
 
     </div>
 
+        {{-- Impuesto --}}
+    <div>
+
+        <label
+            for="{{ $isEdit ? 'edit-tax-'.$group->id : 'new-tax' }}"
+            class="mb-2 block text-sm font-medium text-slate-700"
+        >
+            Impuesto
+        </label>
+
+        <select
+            id="{{ $isEdit ? 'edit-tax-'.$group->id : 'new-tax' }}"
+            name="tax_id"
+            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+        >
+
+            <option value="">
+                Sin impuesto
+            </option>
+
+            @foreach($taxes as $tax)
+
+                <option
+                    value="{{ $tax->id }}"
+                    @selected(
+                        old(
+                            'tax_id',
+                            $group->tax_id ?? null
+                        ) == $tax->id
+                    )
+                >
+                    {{ $tax->name }} ({{ number_format($tax->rate, 2) }}%)
+                </option>
+
+            @endforeach
+
+        </select>
+
+        <p class="mt-1 text-xs text-slate-500">
+            Este impuesto se aplicará a los cargos adicionales de las opciones de este grupo.
+        </p>
+
+    </div>
 
     {{-- Orden --}}
     <div>

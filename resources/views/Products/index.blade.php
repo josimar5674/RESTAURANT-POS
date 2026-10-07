@@ -370,11 +370,11 @@
 
     @foreach($products as $product)
 
-    <div
-        id="editProductModal{{ $product->id }}"
-        class="fixed inset-0 z-50 hidden"
-        aria-hidden="true"
-    >
+                <div
+                    id="editProductModal{{ $product->id }}"
+                    class="fixed inset-0 z-50 hidden"
+                    aria-hidden="true"
+                >
 
         <div
             class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
@@ -424,6 +424,8 @@
 
         </div>
 
+         </div>
+
     </div>
 
 @endforeach
@@ -446,7 +448,7 @@
     {{-- Contenedor --}}
     <div class="relative flex min-h-full items-start justify-center p-4 pt-16">
 
-       <div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+       <div class="w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl">
 
             {{-- Header --}}
             <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
@@ -477,7 +479,11 @@
             {{-- Formulario --}}
             <div class="px-6 py-5">
 
-              @include('products._form', ['product' => null])
+     @include('products._form', [
+    'product' => null,
+    'taxes' => $taxes,
+])
+
 
             </div>
 

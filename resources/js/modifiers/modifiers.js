@@ -107,6 +107,45 @@ function closeEditModifierOptionModal(id) {
 
 
 // ============================================================
+// PRECIO DE MODIFICADORES + IMPUESTO
+// ============================================================
+
+function updateModifierOptionPrice(input) {
+
+    const price = parseFloat(input.value) || 0;
+    const taxRate = parseFloat(input.dataset.taxRate) || 0;
+
+    const finalPrice = price * (1 + taxRate / 100);
+
+    const finalPriceElement = input
+    .closest('form')
+    .querySelector('[id*="final-price"]');
+
+        
+
+    if (!finalPriceElement) {
+        return;
+    }
+
+    finalPriceElement.textContent =
+        'L ' + finalPrice.toFixed(2);
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    document
+        .querySelectorAll('input[name="price_adjustment"]')
+        .forEach(function (input) {
+
+            updateModifierOptionPrice(input);
+
+        });
+
+});
+
+
+// ============================================================
 // ESCAPE
 // ============================================================
 
@@ -116,10 +155,8 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
-    // Cerrar modal de nuevo grupo
     closeModifierGroupModal();
 
-    // Cerrar edición de grupos
     document
         .querySelectorAll('[id^="editModifierGroupModal"]')
         .forEach(function (modal) {
@@ -132,10 +169,8 @@ document.addEventListener('keydown', function (event) {
         });
 
 
-    // Cerrar modal de nueva opción
     closeModifierOptionModal();
 
-    // Cerrar edición de opciones
     document
         .querySelectorAll('[id^="editModifierOptionModal"]')
         .forEach(function (modal) {
@@ -156,15 +191,17 @@ document.addEventListener('keydown', function (event) {
 // FUNCIONES DISPONIBLES PARA BLADE
 // ============================================================
 
-window.openModifierGroupModal = openModifierGroupModal;
-window.closeModifierGroupModal = closeModifierGroupModal;
+window.openModifierGroupModal =
+    openModifierGroupModal;
+
+window.closeModifierGroupModal =
+    closeModifierGroupModal;
 
 window.openEditModifierGroupModal =
     openEditModifierGroupModal;
 
 window.closeEditModifierGroupModal =
     closeEditModifierGroupModal;
-
 
 window.openModifierOptionModal =
     openModifierOptionModal;
@@ -177,3 +214,6 @@ window.openEditModifierOptionModal =
 
 window.closeEditModifierOptionModal =
     closeEditModifierOptionModal;
+
+window.updateModifierOptionPrice =
+    updateModifierOptionPrice;

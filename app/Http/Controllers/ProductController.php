@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Models\ModifierGroup;
+use App\Models\Tax;
 
 class ProductController extends Controller
 {
@@ -17,12 +18,18 @@ class ProductController extends Controller
     'category',
     'variants',
      'modifierGroups',
+     'tax',
 ])
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
 
         $categories = ProductCategory::where('active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        $taxes = Tax::where('active', true)
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
@@ -35,7 +42,8 @@ class ProductController extends Controller
        return view('products.index', compact(
             'products',
             'categories',
-            'modifierGroups'
+            'modifierGroups',
+            'taxes'
             ));
 
     }
@@ -131,12 +139,18 @@ public function store(Request $request)
                 'integer',
                 'exists:modifier_groups,id',
             ],
+        'tax_id' => [
+            'nullable',
+            'integer',
+            'exists:taxes,id',
+],
     ]);
 
     DB::transaction(function () use ($request, $data) {
 
         $product = Product::create([
             'category_id' => $data['category_id'],
+            'tax_id' => $data['tax_id'] ?? null,
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'image' => $data['image'] ?? null,
@@ -279,12 +293,19 @@ public function store(Request $request)
             'integer',
             'exists:modifier_groups,id',
         ],
+
+        'tax_id' => [
+            'nullable',
+            'integer',
+            'exists:taxes,id',
+        ],
     ]);
 
     DB::transaction(function () use ($request, $data, $product) {
 
         $product->update([
             'category_id' => $data['category_id'],
+            'tax_id' => $data['tax_id'] ?? null,
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'image' => $data['image'] ?? null,

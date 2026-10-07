@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Models\Tax;
 
 class ModifierGroup extends Model
 {
@@ -13,6 +14,7 @@ class ModifierGroup extends Model
         'description',
         'min_selections',
         'max_selections',
+        'tax_id',
         'sort_order',
         'active',
     ];
@@ -47,5 +49,10 @@ public function products()
         'product_modifier_groups'
     )->withPivot('sort_order')
      ->orderByPivot('sort_order');
+}
+
+public function tax()
+{
+    return $this->belongsTo(Tax::class);
 }
 }

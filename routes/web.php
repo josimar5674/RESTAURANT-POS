@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ModifierGroupController;
 use App\Http\Controllers\ModifierOptionController;
+use App\Http\Controllers\TaxController;
 
 
 Route::middleware('guest')->group(function () {
@@ -62,3 +63,5 @@ Route::delete(
     'modifier-groups/{modifier_group}/options/{modifier_option}',
     [ModifierOptionController::class, 'destroy']
 )->name('modifier-options.destroy');
+
+Route::resource('taxes', TaxController::class);

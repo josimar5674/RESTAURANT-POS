@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\TrustedDevice;
 use Illuminate\Support\Facades\Hash;
 
+
+
 class AuthController extends Controller
 {
     public function loginWithPin(Request $request)
