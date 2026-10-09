@@ -448,36 +448,24 @@
                             Rol
                         </label>
 
-                        <select
-                            x-model="role"
-                            name="role"
-                            class="w-full rounded-xl
-                                   border-slate-300
-                                   focus:border-blue-500
-                                   focus:ring-blue-500"
-                        >
+                       <select
+    x-model="role"
+    name="role"
+    class="w-full rounded-xl
+           border-slate-300
+           focus:border-blue-500
+           focus:ring-blue-500"
+>
 
-                            <option value="Mesero">
-                                Mesero
-                            </option>
+    @foreach ($roles as $roleOption)
 
-                            <option value="Cajero">
-                                Cajero
-                            </option>
+        <option value="{{ $roleOption->name }}">
+            {{ $roleOption->name }}
+        </option>
 
-                            <option value="Gerente">
-                                Gerente
-                            </option>
+    @endforeach
 
-                            <option value="Cocina">
-                                Cocina
-                            </option>
-
-                            <option value="Administrador">
-                                Administrador
-                            </option>
-
-                        </select>
+</select>
 
                     </div>
 
@@ -718,37 +706,25 @@
                             Rol
                         </label>
 
-                        <select
-                            name="role"
-                            x-model="editUser.role"
-                            required
-                            class="w-full rounded-xl
-                                   border-slate-300
-                                   focus:border-blue-500
-                                   focus:ring-blue-500"
-                        >
+    <select
+    name="role"
+    x-model="editUser.role"
+    required
+    class="w-full rounded-xl
+           border-slate-300
+           focus:border-blue-500
+           focus:ring-blue-500"
+>
 
-                            <option value="Mesero">
-                                Mesero
-                            </option>
+    @foreach ($roles as $roleOption)
 
-                            <option value="Cajero">
-                                Cajero
-                            </option>
+        <option value="{{ $roleOption->name }}">
+            {{ $roleOption->name }}
+        </option>
 
-                            <option value="Gerente">
-                                Gerente
-                            </option>
+    @endforeach
 
-                            <option value="Cocina">
-                                Cocina
-                            </option>
-
-                            <option value="Administrador">
-                                Administrador
-                            </option>
-
-                        </select>
+</select>
 
                     </div>
 

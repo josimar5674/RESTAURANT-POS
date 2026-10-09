@@ -5,20 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $users = User::with('roles')
-            ->orderBy('first_name')
-            ->get();
+ public function index()
+{
+    $users = User::with('roles')
+        ->orderBy('first_name')
+        ->get();
 
-        return view('users.index', compact('users'));
-    }
+    $roles = Role::orderBy('name')->get();
+
+    return view('users.index', compact('users', 'roles'));
+}
 
     /**
      * Show the form for creating a new resource.
