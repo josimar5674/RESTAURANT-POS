@@ -65,6 +65,14 @@
         Categorías
     </a>
 
+     <a href="{{ route('modifier-groups.index') }}"
+               class="block rounded-lg px-6 py-3 text-sm transition
+               {{ request()->routeIs('modifier-groups.*')
+                    ? 'bg-slate-800 text-white'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                Grupos de modificadores
+            </a>
+
     {{-- Configuración --}}
     <div class="px-4 pt-6">
 
@@ -109,13 +117,7 @@
                 Impuestos
             </a>
 
-            <a href="{{ route('modifier-groups.index') }}"
-               class="block rounded-lg px-6 py-3 text-sm transition
-               {{ request()->routeIs('modifier-groups.*')
-                    ? 'bg-slate-800 text-white'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                Grupos de modificadores
-            </a>
+           
 
             <a href="{{ route('users.index') }}"
                class="block rounded-lg px-6 py-3 text-sm transition
