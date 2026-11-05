@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\FloorPlanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Api\ProductCatalogController;
+use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\PaymentController;
+
 
 Route::apiResource(
     'restaurant-objects',
@@ -32,3 +35,42 @@ Route::delete('/orders/{orderId}/items/{itemId}',[OrderController::class, 'delet
 Route::post('/orders/{orderId}/send-to-kitchen', [OrderController::class, 'sendToKitchen']);
 Route::get('/orders/table/{tableId}/active', [OrderController::class, 'showActiveForTable']);
 Route::get('/orders/{orderId}', [OrderController::class, 'show']);
+
+//mark item as received
+Route::post(
+    '/orders/{orderId}/items/{itemId}/received',
+    [OrderController::class, 'markItemReceived']
+);
+
+Route::get(
+    '/tables/{tableId}/checkout',
+    [OrderController::class, 'checkout']
+);
+
+
+
+Route::post(
+    '/tables/{tableId}/checkout/accounts',
+    [OrderController::class, 'createCheckoutAccount']
+);
+Route::get(
+
+    '/checkout-accounts/{accountId}',
+
+    [OrderController::class, 'showCheckoutAccount']
+
+);
+
+
+
+Route::get(
+    '/payment-methods/active',
+    [PaymentMethodController::class, 'activeMethods']
+);
+
+
+
+Route::post(
+    '/checkout-accounts/{accountId}/payments',
+    [PaymentController::class, 'store']
+);

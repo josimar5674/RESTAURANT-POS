@@ -58,4 +58,18 @@ class Order extends Model
             'order_id'
         );
     }
+    public function payments()
+{
+    return $this->hasMany(Payment::class);
+}
+
+public function checkoutAccounts()
+{
+    return $this->belongsToMany(
+        CheckoutAccount::class,
+        'checkout_account_orders',
+        'order_id',
+        'checkout_account_id'
+    )->withTimestamps();
+}
 }

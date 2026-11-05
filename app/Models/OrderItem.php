@@ -22,6 +22,8 @@ class OrderItem extends Model
         'subtotal',
         'total',
         'notes',
+        'sent_to_kitchen_at',
+        'received_at',
     ];
 
     protected $casts = [
@@ -32,6 +34,8 @@ class OrderItem extends Model
         'discount' => 'decimal:2',
         'subtotal' => 'decimal:2',
         'total' => 'decimal:2',
+        'sent_to_kitchen_at' => 'datetime',
+        'received_at' => 'datetime',
     ];
 
     protected static function booted(): void

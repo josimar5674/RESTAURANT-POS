@@ -11,6 +11,7 @@ use App\Http\Controllers\ModifierGroupController;
 use App\Http\Controllers\ModifierOptionController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PaymentMethodController;
 
 
 /*
@@ -199,5 +200,20 @@ Route::resource('products', ProductController::class)
     ->middlewareFor('edit', 'permission:taxes.edit')
     ->middlewareFor('update', 'permission:taxes.edit')
     ->middlewareFor('destroy', 'permission:taxes.delete');
+
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource(
+        'payment-methods',
+        PaymentMethodController::class
+    );
+
+    Route::patch(
+        'payment-methods/{paymentMethod}/toggle-status',
+        [PaymentMethodController::class, 'toggleStatus']
+    )->name('payment-methods.toggle-status');
+});
 
 });
